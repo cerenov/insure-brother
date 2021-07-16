@@ -2,5 +2,5 @@
 
 После того как проект будет развернут, нужно выполнить комманды: 
 ```sh
-docker-compose exec app php artisan migrate
+docker-compose exec insure_brother-app php artisan migrate
 ```
