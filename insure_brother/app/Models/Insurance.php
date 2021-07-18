@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Insurance extends Model
 {
     use HasFactory;
+
+    /**
+     * @var mixed
+     */
+    /**
+     * @var mixed
+     */
 }
