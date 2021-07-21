@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Response extends Model
 {
     use HasFactory;
+
+    public function insurance()
+    {
+        return $this->belongsTo(Insurance::class);
+    }
 }

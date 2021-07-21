@@ -15,15 +15,18 @@ use \App\Http\Controllers\ResponseController;
 |
 */
 
-Route::get('/', [ResponseController::class, 'index']);
-
+Route::get('/', [InsuranceController::class, 'indexForClient'])->name('home');
 Route::get('/dashboard', [InsuranceController::class, 'index'])->middleware(['auth'])->name('dashboard');
 Route::get('/insurance/create', function () {
-    return view('insurance');
+    return view('new_insurance');
 })->middleware('auth')->name('create_insurance');
 Route::post('/insurance/create', [InsuranceController::class, 'create'])->middleware('auth')->name('create_insurance');
-Route::get('/insurance/{id}/read', [InsuranceController::class, 'read'])->middleware('auth');
+Route::get('/insurance/{id}/read', [InsuranceController::class, 'read'])->middleware('auth')->name('read_insurance');
 Route::post('/insurance/{id}/update', [InsuranceController::class, 'update'])->middleware('auth')->name('update_insurance');
 Route::post('/insurance/{id}/delete', [InsuranceController::class, 'delete'])->middleware('auth')->name('delete_insurance');
+Route::get('/insurance/{id}/read-client', [InsuranceController::class, 'readForClient'])->name('read_insurance_for_client');
+
+Route::get('/responses', [ResponseController::class, 'index'])->middleware('auth')->name('index_response');
+Route::post('/response/create', [ResponseController::class, 'create'])->name('create_response');
 
 require __DIR__ . '/auth.php';

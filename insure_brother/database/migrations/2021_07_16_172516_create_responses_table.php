@@ -15,7 +15,7 @@ class CreateResponsesTable extends Migration
     {
         Schema::create('responses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('insurances_id')->constrained()->onDelete('cascade');
+            $table->foreignId('insurance_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('phone');
             $table->string('mail');

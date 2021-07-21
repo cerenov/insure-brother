@@ -9,6 +9,11 @@ class Insurance extends Model
 {
     use HasFactory;
 
+    public function responses()
+    {
+        return $this->hasMany(Response::class);
+    }
+
     /**
      * @var mixed
      */

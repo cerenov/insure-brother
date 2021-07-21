@@ -12,9 +12,6 @@ class InsuranceController extends Controller
 {
     public function index()
     {
-        if (!Auth::check()) {
-            return abort(404);
-        }
         $insurances = Insurance::where('user_id', Auth::user()->id)->get();
 
         return view('dashboard', [
@@ -34,20 +31,17 @@ class InsuranceController extends Controller
 
     public function create(Request $request)
     {
+        $data = $request->only(['title', 'text', 'price']);
 
-        if (Auth::check()) {
-            $data = $request->only(['title', 'text', 'price']);
+        $insurance = new Insurance();
+        $insurance->title = $data['title'];
+        $insurance->text = $data['text'];
+        $insurance->price = $data['price'];
+        $insurance->user_id = Auth::user()->id;
 
-            $insurance = new Insurance();
-            $insurance->title = $data['title'];
-            $insurance->text = $data['text'];
-            $insurance->price = $data['price'];
-            $insurance->user_id = Auth::user()->id;
+        $insurance->save();
 
-            $insurance->save();
-
-            return Redirect()->route('dashboard')->with('success', 'Услуга добавлена');
-        }
+        return Redirect()->route('dashboard')->with('success', 'Услуга добавлена');
     }
 
     public function delete(Request $request)
@@ -79,5 +73,24 @@ class InsuranceController extends Controller
         $insurance->save();
 
         return Redirect()->route('dashboard')->with('success', 'Услуга отредактирована');
+    }
+
+    public function indexForClient()
+    {
+        $insurances = Insurance::all();
+
+        return view('home', [
+            'insurances' => $insurances
+        ]);
+
+    }
+
+    public function readForClient(Request $request)
+    {
+        $insurance = Insurance::find($request->id);
+
+        return view('read_insurance_for_client', [
+            'insurance' => $insurance
+        ]);
     }
 }
