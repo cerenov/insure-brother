@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    @include('layouts.navigation')
     <form action="/insurance/{{$insurance->id}}/update" method="POST">
         @csrf
         <input type="hidden" name="id" value="{{$insurance->id}}">

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    @include('layouts.navigation')
     <ul class="list-group">
         @foreach($insurances as $insurances)
             @foreach($insurances->responses as $response)
