@@ -30,6 +30,11 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 RUN ln --symbolic ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln --symbolic ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
     
+#sockets
+RUN docker-php-ext-install sockets
+RUN docker-php-ext-configure sockets
+RUN docker-php-ext-enable sockets
+
 
 # Create system user to run Composer and Artisan Commands
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
@@ -43,6 +48,6 @@ WORKDIR /var/www
 
 USER $user
 
-CMD ["sh", "-c", "cp -n .env.example .env && composer install && php artisan key:generate && php-fpm"]
+CMD ["sh", "-c", "cp -n .env.example .env && composer install && composer update && php artisan key:generate && php-fpm"]
 
 EXPOSE 9000

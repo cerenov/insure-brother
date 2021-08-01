@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TestJob;
 use App\Models\Response;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\Insurance;
@@ -32,6 +34,9 @@ class ResponseController extends Controller
         $response->cost = 0;
 
         $response->save();
+
+//        $users = User::all();
+//        TestJob::dispatch('$users->toArray()');
 
         return Redirect()->route('home')->with('success', 'Отклик отправлен');
     }
