@@ -57,6 +57,16 @@ services:
     networks:
       - insure_brother
 
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+    networks:
+      - insure_brother
+
 networks:
   insure_brother:
     driver: bridge

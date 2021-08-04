@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMessage;
 use App\Models\Insurance;
+use http\Client\Curl\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class InsuranceController extends Controller
@@ -32,13 +35,13 @@ class InsuranceController extends Controller
     public function create(Request $request)
     {
         $data = $request->only(['title', 'text', 'price']);
+        $user = Auth::user();
 
         $insurance = new Insurance();
         $insurance->title = $data['title'];
         $insurance->text = $data['text'];
         $insurance->price = $data['price'];
-        $insurance->user_id = Auth::user()->id;
-
+        $insurance->user()->associate($user);
         $insurance->save();
 
         return Redirect()->route('dashboard')->with('success', 'Услуга добавлена');

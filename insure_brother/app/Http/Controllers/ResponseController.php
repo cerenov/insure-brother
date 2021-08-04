@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMessage;
 use App\Jobs\TestJob;
 use App\Models\Response;
 use App\Models\User;
@@ -35,8 +36,13 @@ class ResponseController extends Controller
 
         $response->save();
 
-//        $users = User::all();
-//        TestJob::dispatch('$users->toArray()');
+        $insurance = Insurance::find($data['id']);
+
+        $user = $insurance->user()->get();
+        if ($user->isNotEmpty()) {
+            //dd($response->getAttributes());
+            SendMessage::dispatch($user[0]->email, $response);
+        }
 
         return Redirect()->route('home')->with('success', 'Отклик отправлен');
     }

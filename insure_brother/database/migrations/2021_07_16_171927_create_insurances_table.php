@@ -15,10 +15,10 @@ class CreateInsurancesTable extends Migration
     {
         Schema::create('insurances', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('text');
             $table->decimal('price', $precision = 15, $scale = 2);
-            $table->bigInteger('user_id');
             $table->timestamps();
         });
     }
