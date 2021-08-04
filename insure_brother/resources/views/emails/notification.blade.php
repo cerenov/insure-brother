@@ -6,11 +6,11 @@ id отклика: {{$id}}<br>
 phone: {{$phone}}<br>
 emil: {{$email}}<br>
 
-@component('mail::button', ['url' => 'http://localhost:8000/dashboard'])
+@component('mail::button', ['url' => 'http://localhost:8000/responses'])
     перейти к откликам
 @endcomponent
 
-@component('mail::button', ['url' => 'http://localhost:8000/responses/read'])
+@component('mail::button', ['url' => $url_read_response])
     открыть карточку отклика
 @endcomponent
 

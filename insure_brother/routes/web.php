@@ -16,19 +16,20 @@ use \App\Http\Controllers\ResponseController;
 */
 
 Route::get('/', [InsuranceController::class, 'indexForClient'])->name('home');
-Route::get('/dashboard', [InsuranceController::class, 'index'])->middleware(['auth'])->name('dashboard');
 Route::get('/insurance/{id}/read-client', [InsuranceController::class, 'readForClient'])->name('read_insurance_for_client');
 Route::post('/response/create', [ResponseController::class, 'create'])->name('create_response');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/insurance/create', function () {
-        return view('new_insurance');
-    })->middleware('auth')->name('create_insurance');
-    Route::post('/insurance/create', [InsuranceController::class, 'create'])->middleware('auth')->name('create_insurance');
-    Route::get('/insurance/{id}/read', [InsuranceController::class, 'read'])->middleware('auth')->name('read_insurance');
-    Route::post('/insurance/{id}/update', [InsuranceController::class, 'update'])->middleware('auth')->name('update_insurance');
-    Route::post('/insurance/{id}/delete', [InsuranceController::class, 'delete'])->middleware('auth')->name('delete_insurance');
-    Route::get('/responses', [ResponseController::class, 'index'])->middleware('auth')->name('index_response');
+        return view('users.new_insurance');
+    })->name('create_insurance');
+    Route::get('/dashboard', [InsuranceController::class, 'index'])->name('dashboard');
+    Route::post('/insurance/create', [InsuranceController::class, 'create'])->name('create_insurance');
+    Route::get('/insurance/{id}/read', [InsuranceController::class, 'read'])->name('read_insurance');
+    Route::post('/insurance/{id}/update', [InsuranceController::class, 'update'])->name('update_insurance');
+    Route::post('/insurance/{id}/delete', [InsuranceController::class, 'delete'])->name('delete_insurance');
+    Route::get('/responses', [ResponseController::class, 'index'])->name('index_response');
+    Route::get('/responses/{id}/read', [ResponseController::class, 'read'])->name('read_response');
 });
 
 require __DIR__ . '/auth.php';

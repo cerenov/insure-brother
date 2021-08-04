@@ -27,7 +27,7 @@ class InsuranceController extends Controller
     {
         $insurance = Insurance::find($request->id);
 
-        return view('read_insurance', [
+        return view('users.read_insurance', [
             'insurance' => $insurance
         ]);
     }
@@ -92,7 +92,7 @@ class InsuranceController extends Controller
     {
         $insurance = Insurance::find($request->id);
 
-        return view('read_insurance_for_client', [
+        return view('clients.read_insurance_for_client', [
             'insurance' => $insurance
         ]);
     }

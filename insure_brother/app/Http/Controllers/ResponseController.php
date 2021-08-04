@@ -17,7 +17,7 @@ class ResponseController extends Controller
     {
         $insurances = Insurance::with('responses')->where('user_id', Auth::user()->id)->get();
 
-        return view('read_response', [
+        return view('users.index_responses', [
             'insurances' => $insurances
         ]);
     }
@@ -40,10 +40,18 @@ class ResponseController extends Controller
 
         $user = $insurance->user()->get();
         if ($user->isNotEmpty()) {
-            //dd($response->getAttributes());
             SendMessage::dispatch($user[0]->email, $response);
         }
 
         return Redirect()->route('home')->with('success', 'Отклик отправлен');
+    }
+
+    public function read(Request $request)
+    {
+        $response = Response::find($request->id);
+
+        return view('users.read_response', [
+            'response' => $response
+        ]);
     }
 }
