@@ -2,6 +2,16 @@
 
 @section('content')
     @include('layouts.navigation')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{route('create_insurance')}}" method="POST">
         @csrf
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateResponseRequest;
 use App\Jobs\SendMessage;
 use App\Jobs\TestJob;
 use App\Models\Response;
@@ -22,7 +23,7 @@ class ResponseController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(CreateResponseRequest $request)
     {
         $data = $request->only(['name', 'phone', 'mail', 'id']);
 

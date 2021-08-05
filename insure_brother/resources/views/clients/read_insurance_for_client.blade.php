@@ -1,11 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="min-h-screen bg-gray-100">
         <div class="container">
             <form action="/response/create" method="POST">
                 @csrf
-                <input type="hidden" name="id" value="{{$insurance->id}}">
+                <input type="hidden" name="id" value="{{$insurance->id}}" id="id">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="name">name</span>
                     <input type="text" class="form-control" placeholder="name" name="name" aria-label="name"

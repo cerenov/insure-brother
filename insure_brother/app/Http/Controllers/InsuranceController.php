@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateInsurenceRequest;
+use App\Http\Requests\InsurenceRequest;
+use App\Http\Requests\ReadInsurenceRequest;
+use App\Http\Requests\UpdateInsurenceRequest;
 use App\Jobs\SendMessage;
 use App\Models\Insurance;
 use http\Client\Curl\User;
@@ -32,7 +36,7 @@ class InsuranceController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(CreateInsurenceRequest $request)
     {
         $data = $request->only(['title', 'text', 'price']);
         $user = Auth::user();
@@ -60,7 +64,7 @@ class InsuranceController extends Controller
         return Redirect()->route('dashboard')->with('success', 'Услуга удалена');
     }
 
-    public function update(Request $request)
+    public function update(UpdateInsurenceRequest $request)
     {
         $data = $request->only(['title', 'text', 'price', 'id']);
 
