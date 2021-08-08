@@ -2,6 +2,7 @@
 
 @section('content')
     @include('layouts.navigation')
+    Список:
     <ul class="list-group">
         @foreach($insurances as $insurances)
             @foreach($insurances->responses as $response)
