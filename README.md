@@ -7,7 +7,7 @@ docker exec -it insure_brother-app npm run dev
 docker exec -it insure_brother-app php artisan migrate
 ```
 
-В файл .env нужно настроить параметры
+В файле .env нужно настроить параметры
 ```sh
 MAIL_MAILER
 MAIL_HOST
