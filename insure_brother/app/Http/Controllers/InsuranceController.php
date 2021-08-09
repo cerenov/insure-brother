@@ -14,12 +14,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use App\Repositories\Interfaces\InsuranceRepositoryInterface;
 
 class InsuranceController extends Controller
 {
+    private $InsuranceRepository;
+
+    public function __construct(InsuranceRepositoryInterface $InsuranceRepository)
+    {
+        $this->InsuranceRepository = $InsuranceRepository;
+    }
+
     public function index()
     {
-        $insurances = Insurance::where('user_id', Auth::user()->id)->get();
+        $user = Auth::user();
+        $insurances = $this->InsuranceRepository->getAll($user);
 
         return view('dashboard', [
             'insurances' => $insurances
@@ -29,7 +38,7 @@ class InsuranceController extends Controller
 
     public function read(Request $request)
     {
-        $insurance = Insurance::find($request->id);
+        $insurance = $this->InsuranceRepository->getByID($request->id);
 
         return view('users.read_insurance', [
             'insurance' => $insurance
@@ -40,26 +49,20 @@ class InsuranceController extends Controller
     {
         $data = $request->only(['title', 'text', 'price']);
         $user = Auth::user();
-
-        $insurance = new Insurance();
-        $insurance->title = $data['title'];
-        $insurance->text = $data['text'];
-        $insurance->price = $data['price'];
-        $insurance->user()->associate($user);
-        $insurance->save();
+        $this->InsuranceRepository->create($data['title'], $data['text'], $data['price'], $user);
 
         return Redirect()->route('dashboard')->with('success', 'Услуга добавлена');
     }
 
     public function delete(Request $request)
     {
-        $Insurance = Insurance::find($request->id);
+        $insurance = $this->InsuranceRepository->getByID($request->id);
 
-        if (!$Insurance) {
+        if (!$insurance) {
             return abort(404);
         }
 
-        $Insurance->delete();
+        $this->InsuranceRepository->delete($request->id);
 
         return Redirect()->route('dashboard')->with('success', 'Услуга удалена');
     }
@@ -74,27 +77,23 @@ class InsuranceController extends Controller
             return abort(404);
         }
 
-        $insurance->title = $data['title'];
-        $insurance->text = $data['text'];
-        $insurance->price = $data['price'];
-        $insurance->save();
+        $this->InsuranceRepository->update($data['title'], $data['text'], $data['price'], $insurance);
 
         return Redirect()->route('dashboard')->with('success', 'Услуга отредактирована');
     }
 
     public function indexForClient()
     {
-        $insurances = Insurance::all();
+        $insurances = $this->InsuranceRepository->getAll();
 
         return view('home', [
             'insurances' => $insurances
         ]);
-
     }
 
     public function readForClient(Request $request)
     {
-        $insurance = Insurance::find($request->id);
+        $insurance = $this->InsuranceRepository->getByID($request->id);
 
         return view('clients.read_insurance_for_client', [
             'insurance' => $insurance
