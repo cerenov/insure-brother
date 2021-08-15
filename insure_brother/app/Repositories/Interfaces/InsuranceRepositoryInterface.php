@@ -6,7 +6,6 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\Insurance;
 use App\Models\User;
-use phpDocumentor\Reflection\Types\Boolean;
 
 interface InsuranceRepositoryInterface
 {

@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Insurance;
 use App\Repositories\Interfaces\InsuranceRepositoryInterface;
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -22,19 +25,20 @@ class ReindexCommand extends Command
      */
     protected $description = 'Command description';
 
-
-    private $insurance_repository;
+    private $elasticsearch;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(InsuranceRepositoryInterface $insurance_repository)
+    public function __construct(ClientBuilder $elasticsearch)
     {
         parent::__construct();
 
-        $this->insurance_repository = $insurance_repository;
+        $this->elasticsearch = ClientBuilder::create()
+            ->setHosts([env('ELASTICSEARCH_HOST','elasticsearch').':'.env('ELASTICSEARCH_PORT','9200')])
+            ->build();
     }
 
     /**
@@ -44,6 +48,23 @@ class ReindexCommand extends Command
      */
     public function handle()
     {
+        $this->info('Indexing all Insurances');
+
+        Insurance::chunk(200, function ($insurances) {
+            foreach ($insurances as $insurance) {
+                $this->elasticsearch->index([
+                    'index' => 'insurances',
+                    'id' => $insurance->id,
+                    'body' => [
+                        'title' => $insurance->title,
+                        'text' => $insurance->text,
+                    ]
+                ]);
+                $this->output->write('.');
+            }
+        });
+        $this->info('\nDone!');
+
         return 0;
     }
 }

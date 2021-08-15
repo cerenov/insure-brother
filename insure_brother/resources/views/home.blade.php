@@ -425,19 +425,23 @@
             </form>
         </div>
         <div class="list-group">
-            @foreach($insurances['hits']['hits'] as $insurance)
+            @foreach($insurances as $insurance)
                 <div class="d-flex">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{$insurance['_source']['title']}}</h5>
+                        <h5 class="mb-1">{{$insurance['title']}}</h5>
                     </div>
-                    <form action="/insurance/{{$insurance['_id']}}/read-client" method="get">
+                    <form action="/insurance/{{$insurance['id']}}/read-client" method="get">
                         @csrf
                         <button type="submit" class="btn btn-success mt-3 mb-3" style="width: 100px;">детально</button>
                     </form>
                 </div>
             @endforeach
         </div>
+        <div class="bg-white p-4 mt-6">
+            {{ $insurances->links() }}
+        </div>
     </div>
+
 </div>
 </body>
 </html>

@@ -3,34 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateInsurenceRequest;
-use App\Http\Requests\InsurenceRequest;
-use App\Http\Requests\ReadInsurenceRequest;
 use App\Http\Requests\UpdateInsurenceRequest;
-use App\Jobs\SendMessage;
 use App\Models\Insurance;
-use Elasticsearch\ClientBuilder;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Elasticsearch\Helper\Iterators\SearchResponseIterator;
-use http\Client\Curl\User;
-use http\Env\Url;
-use Illuminate\Database\Eloquent\Model;
+use App\Repositories\Interfaces\ElasticsearchInterface;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redirect;
 use App\Repositories\Interfaces\InsuranceRepositoryInterface;
+use Illuminate\Support\Collection;
+
 
 class InsuranceController extends Controller
 {
     private $insurance_repository;
-    private $client;
+    private $elasticsearch;
 
-    public function __construct(InsuranceRepositoryInterface $insurance_repository)
+    public function __construct(InsuranceRepositoryInterface $insurance_repository, ElasticsearchInterface $elasticsearch)
     {
         $this->insurance_repository = $insurance_repository;
-        $this->client = ClientBuilder::create()
-            ->setHosts(['elasticsearch:9200'])
-            ->build();
+        $this->elasticsearch = $elasticsearch;
     }
 
     public function index()
@@ -57,46 +49,20 @@ class InsuranceController extends Controller
     {
         $data = $request->only(['title', 'text', 'price']);
         $user = Auth::user();
-        $insurance = $this->insurance_repository->create($data['title'], $data['text'], $data['price'], $user);
-
-        $params = [
-            'index' => 'insurances',
-            'id' => $insurance->id,
-            'body' => [
-                'title' => $insurance->title,
-                'text' => $insurance->text,
-            ]
-        ];
-        try {
-            $this->client->index($params);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-        }
-
+        $this->insurance_repository->create($data['title'], $data['text'], $data['price'], $user);
 
         return Redirect()->route('dashboard')->with('success', 'Услуга добавлена');
     }
 
     public function delete(Request $request)
     {
-        $insurance = $this->InsuranceRepository->getByID($request->id);
+        $insurance = $this->insurance_repository->getByID($request->id);
 
         if (!$insurance) {
             return abort(404);
         }
 
-        $this->InsuranceRepository->delete($request->id);
-
-        $params = [
-            'index' => 'insurances',
-            'id' => $request->id
-        ];
-
-        try {
-            $this->client->delete($params);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-        }
+        $this->insurance_repository->delete($request->id);
 
         return Redirect()->route('dashboard')->with('success', 'Услуга удалена');
     }
@@ -113,23 +79,6 @@ class InsuranceController extends Controller
 
         $insurance = $this->insurance_repository->update($data['title'], $data['text'], $data['price'], $insurance);
 
-        $params = [
-            'index' => 'insurances',
-            'id' => $insurance->id,
-            'body' => [
-                'doc' => [
-                    'title' => $insurance->title,
-                    'text' => $insurance->text
-                ]
-            ]
-        ];
-
-        try {
-            $this->client->update($params);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-        }
-
         return Redirect()->route('dashboard')->with('success', 'Услуга отредактирована');
     }
 
@@ -140,36 +89,9 @@ class InsuranceController extends Controller
             $search = $request->q;
         }
 
-        if ($search == '') {
-            $params = [
-                'index' => 'insurances',
-                'body' => [
-                    'query' => [
-                        'match_all' => new \stdClass()
+        $results = $this->elasticsearch->search($search);
 
-                    ],
-                    'fields' => ['title', 'text']
-                ]
-            ];
-        } else {
-            $params = [
-                'index' => 'insurances',
-                'body' => [
-                    'query' => [
-                        'multi_match' => [
-                            'query' => $search,
-                            'fields' => ['title', 'text']
-                        ]
-                    ]
-                ]
-            ];
-        }
-
-        try {
-            $insurances = $this->client->search($params);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-        }
+        $insurances = $this->paginate($results);
 
         return view('home', [
             'insurances' => $insurances,
@@ -184,5 +106,12 @@ class InsuranceController extends Controller
         return view('clients.read_insurance_for_client', [
             'insurance' => $insurance
         ]);
+    }
+
+    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\ElasticsearchRepository;
 use App\Repositories\InsuranceRepository;
+use App\Repositories\Interfaces\ElasticsearchInterface;
 use App\Repositories\Interfaces\InsuranceRepositoryInterface;
 use Elasticsearch\Client;
 use Illuminate\Support\ServiceProvider;
@@ -18,8 +20,13 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             InsuranceRepositoryInterface::class,
-            InsuranceRepository::class
+            InsuranceRepository::class,
         );
+        $this->app->bind(
+            ElasticsearchInterface::class,
+            ElasticsearchRepository::class,
+        );
+
     }
 
     /**
